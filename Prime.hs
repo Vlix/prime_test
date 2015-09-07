@@ -5,30 +5,42 @@ import System.IO
 
 
 primes :: IO ()
-primes = forever $ do
+primes = do
     let pFile = "Primes.txt"
-    let iFile = "It.txt"
     pContent <- readFile pFile
-    pIt <- readFile iFile
     let pList = read pContent :: [Integer]
-    let pTest' = read pIt :: Integer
-    let pTest = if pTest' `mod` 5 == 0 then pTest' + 2 else pTest'
-    if isPrime pTest pList
-        then do
-            writeFile pFile $ show $ addPrime pTest pList
-            writeFile iFile $ show $ pTest + 2
-            putStrLn $ "\nWE GOT ONE! (" ++ show pTest ++ ")\n"
-        else do
-            writeFile iFile $ show $ pTest + 2
-            putStrLn "NOPE"
+    let pTest = (last pList) + 2
+    primeLoop pTest pList pFile pTest
+        
 
 ----------------------------------------------------
 
 isPrime :: Integer -> [Integer] -> Bool
 isPrime _ [] = True
 isPrime start (i:is)
-    | (start `mod` i) /= 0 = isPrime start is
-    | otherwise = False
+    | (fromIntegral start) / (fromIntegral i) >= 2.0 =
+        if (start `mod` i) /= 0
+            then isPrime start is
+            else False
+    | otherwise = True
 
 addPrime :: Integer -> [Integer] -> [Integer]
 addPrime int is = is ++ [int]
+
+primeLoop :: Integer -> [Integer] -> FilePath -> Integer -> IO ()
+primeLoop latest soFar pFile buffer = do
+    let latest' = if latest `mod` 5 == 0 then latest + 2 else latest
+    if isPrime latest' soFar
+        then do
+            let soFar' = addPrime latest' soFar
+            let latest'' = latest' + 2
+            putStrLn $ "\nWE GOT ONE! (" ++ show latest' ++ ")\n"
+            if latest > (buffer + 50000)
+                then do
+                    writeFile pFile $ show $ soFar'
+                    primeLoop latest'' soFar' pFile latest''
+                else primeLoop latest'' soFar' pFile buffer
+        else do
+            let latest'' = latest' + 2
+            putStrLn "NOPE"
+            primeLoop latest'' soFar pFile buffer
