@@ -36,8 +36,9 @@ primeLoop latest soFar pFile buffer = do
             let soFar' = addPrime latest' soFar
             let latest'' = latest' + 2
             putStrLn $ "\nWE GOT ONE! (" ++ show latest' ++ ")\n"
-            if latest > (buffer + 100000)
+            if latest' > (buffer + 50000)
                 then do
+                    putStrLn "-- Writing to file : Writing to file : Writing to file --"
                     writeFile pFile $ show $ F.toList soFar'
                     primeLoop latest'' soFar' pFile latest''
                 else primeLoop latest'' soFar' pFile buffer
