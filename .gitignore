@@ -4,6 +4,8 @@ cabal-dev
 *.hi
 *.chi
 *.chs.h
+*.exe
+Primes.txt
 .virtualenv
 .hsenv
 .cabal-sandbox/
